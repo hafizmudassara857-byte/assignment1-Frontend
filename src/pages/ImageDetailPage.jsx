@@ -12,7 +12,7 @@ import {
   fetchImageById,
   submitRating
 } from '../services/imageService';
-import { getImageSource, normalizeImage } from '../utils/normalizeImage';
+import { getImageAuthor, getImageSource, normalizeImage } from '../utils/normalizeImage';
 
 function ImageDetailPage() {
   const routeParams = useParams();
@@ -173,15 +173,16 @@ function ImageDetailPage() {
               <span className="eyebrow">Detail</span>
               <h2>{image.title}</h2>
             </div>
-
-            <span className="detail-author">
-              {image.author || image.creator || image.creatorId?.username || 'Unknown'}
-            </span>
           </div>
 
           <p className="detail-caption">{image.caption}</p>
 
           <dl className="metadata-grid">
+            <div>
+              <dt>Author</dt>
+              <dd>{getImageAuthor(image)}</dd>
+            </div>
+
             <div>
               <dt>Location</dt>
               <dd>{image.location || '—'}</dd>

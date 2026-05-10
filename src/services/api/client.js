@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://assignment1-dbagfgb9aweyh6bn.polandcentral-01.azurewebsites.net/api";
+  "https://myass1-b6ambrdhhhg4hkg2.polandcentral-01.azurewebsites.net/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
