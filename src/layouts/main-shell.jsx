@@ -1,8 +1,14 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, LogOut, LogIn, UploadCloud, Image as ImageIcon } from "lucide-react";
+import {
+  Bell,
+  LogOut,
+  LogIn,
+  UploadCloud,
+  Image as ImageIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { fetchNotifications } from "../services/notificationService";
-import Button from "./Button";
+import { fetchNotifications } from "../lib/notifications-api";
+import Button from "../ui/button";
 
 function safeParseUser(raw) {
   try {
@@ -13,7 +19,7 @@ function safeParseUser(raw) {
   }
 }
 
-export default function AppShell({ children }) {
+export default function MainShell({ children }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -64,7 +70,8 @@ export default function AppShell({ children }) {
 
   const navItems = useMemo(() => {
     const base = [{ href: "/", label: "Explore", icon: ImageIcon }];
-    if (user?.role === "creator") base.push({ href: "/creator", label: "Creator", icon: UploadCloud });
+    if (user?.role === "creator")
+      base.push({ href: "/creator", label: "Creator", icon: UploadCloud });
     return base;
   }, [user?.role]);
 
@@ -111,7 +118,9 @@ export default function AppShell({ children }) {
                     <Bell size={16} />
                     <span className="hide-sm">Notifications</span>
                   </span>
-                  {notifications.length > 0 && <span className="badge">{notifications.length}</span>}
+                  {notifications.length > 0 && (
+                    <span className="badge">{notifications.length}</span>
+                  )}
                 </Button>
 
                 {showNotifications && (
@@ -129,7 +138,11 @@ export default function AppShell({ children }) {
                       <div className="panel-item">No notifications</div>
                     )}
 
-                    <button className="panel-close" onClick={() => setShowNotifications(false)}>
+                    <button
+                      className="panel-close"
+                      type="button"
+                      onClick={() => setShowNotifications(false)}
+                    >
                       Close
                     </button>
                   </div>
@@ -158,7 +171,10 @@ export default function AppShell({ children }) {
               </Button>
             </>
           ) : (
-            <Link to="/auth" className={pathname === "/auth" ? "nav-pill active" : "nav-pill"}>
+            <Link
+              to="/auth"
+              className={pathname === "/auth" ? "nav-pill active" : "nav-pill"}
+            >
               <LogIn size={16} />
               <span>Login</span>
             </Link>

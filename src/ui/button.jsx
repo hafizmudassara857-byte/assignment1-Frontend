@@ -1,14 +1,14 @@
-function Button({
+export default function Button({
   children,
-  className = '',
-  variant = 'primary',
+  className = "",
+  variant = "primary",
   isLoading = false,
   disabled,
   ...props
 }) {
   return (
     <button
-      className={`button button-${variant} ${isLoading ? 'is-loading' : ''} ${className}`.trim()}
+      className={`button button-${variant} ${isLoading ? "is-loading" : ""} ${className}`.trim()}
       disabled={disabled || isLoading}
       {...props}
     >
@@ -17,5 +17,3 @@ function Button({
     </button>
   );
 }
-
-export default Button;

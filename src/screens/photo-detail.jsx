@@ -1,34 +1,34 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import CommentList from '../components/CommentList';
-import EmptyState from '../components/EmptyState';
-import LoadingState from '../components/LoadingState';
-import RatingStars from '../components/RatingStars';
-import Textarea from '../components/Textarea';
+import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+import Button from "../ui/button";
+import Card from "../ui/card";
+import CommentThread from "../ui/comment-thread";
+import EmptyMessage from "../ui/empty-message";
+import LoadingSpinner from "../ui/loading-spinner";
+import RatingStars from "../ui/rating-stars";
+import TextareaField from "../ui/textarea-field";
+import { addComment, fetchImageById, submitRating } from "../lib/gallery-api";
 import {
-  addComment,
-  fetchImageById,
-  submitRating
-} from '../services/imageService';
-import { getImageAuthor, getImageSource, normalizeImage } from '../utils/normalizeImage';
+  getImageAuthor,
+  getImageSource,
+  normalizeImage,
+} from "../helpers/photo-data";
 
-function ImageDetailPage() {
+export default function PhotoDetail() {
   const routeParams = useParams();
   const imageId = routeParams.imageId;
 
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
 
   const [rating, setRating] = useState(0);
   const [savingComment, setSavingComment] = useState(false);
   const [savingRating, setSavingRating] = useState(false);
-  const [commentError, setCommentError] = useState('');
-  const [ratingError, setRatingError] = useState('');
+  const [commentError, setCommentError] = useState("");
+  const [ratingError, setRatingError] = useState("");
 
   useEffect(() => {
     if (!imageId) return;
@@ -36,7 +36,7 @@ function ImageDetailPage() {
 
     async function load() {
       setLoading(true);
-      setError('');
+      setError("");
 
       try {
         const data = await fetchImageById(imageId);
@@ -44,18 +44,19 @@ function ImageDetailPage() {
 
         const normalized = {
           ...normalizeImage(data),
-          uploadedAt: data?.uploadedAt || data?.createdAt || '—',
+          uploadedAt: data?.uploadedAt || data?.createdAt || "—",
           comments: (data?.comments || []).map((c) => ({
             id: c?.id || c?._id,
-            author: c?.author || c?.userName || c?.userId?.username || 'Unknown',
-            text: c?.text || ''
-          }))
+            author:
+              c?.author || c?.userName || c?.userId?.username || "Unknown",
+            text: c?.text || "",
+          })),
         };
 
         setImage(normalized);
         setRating(Math.round(normalized.rating || 0));
       } catch {
-        if (active) setError('Image not found.');
+        if (active) setError("Image not found.");
       } finally {
         if (active) setLoading(false);
       }
@@ -72,9 +73,9 @@ function ImageDetailPage() {
   const imageSrc = getImageSource(image);
 
   const people = useMemo(() => {
-    if (!image?.people) return '—';
+    if (!image?.people) return "—";
     return Array.isArray(image.people)
-      ? image.people.join(', ')
+      ? image.people.join(", ")
       : image.people;
   }, [image]);
 
@@ -83,12 +84,12 @@ function ImageDetailPage() {
 
     if (!id || !comment.trim()) return;
 
-    setCommentError('');
+    setCommentError("");
     setSavingComment(true);
 
     try {
       const newComment = await addComment(id, {
-        text: comment.trim()
+        text: comment.trim(),
       });
 
       setImage((prev) => ({
@@ -97,15 +98,20 @@ function ImageDetailPage() {
           ...(prev.comments || []),
           {
             id: newComment?.id || newComment?._id || `new-comment-${Date.now()}`,
-            author: newComment?.author || newComment?.user?.username || 'You',
-            text: newComment?.text || comment.trim()
-          }
-        ]
+            author:
+              newComment?.author ||
+              newComment?.user?.username ||
+              "You",
+            text: newComment?.text || comment.trim(),
+          },
+        ],
       }));
 
-      setComment('');
+      setComment("");
     } catch (err) {
-      setCommentError(err.response?.data?.message || 'Failed to post comment.');
+      setCommentError(
+        err.response?.data?.message || "Failed to post comment."
+      );
     } finally {
       setSavingComment(false);
     }
@@ -114,7 +120,7 @@ function ImageDetailPage() {
   async function changeRating(value) {
     if (!id) return;
 
-    setRatingError('');
+    setRatingError("");
     setRating(value);
     setSavingRating(true);
 
@@ -122,9 +128,7 @@ function ImageDetailPage() {
       const result = await submitRating(id, value);
       setImage((prev) => {
         const nextRating =
-          result?.averageRating ??
-          result?.rating ??
-          value;
+          result?.averageRating ?? result?.rating ?? value;
         const nextReviewCount =
           result?.reviewsCount ??
           result?.ratingCount ??
@@ -133,24 +137,26 @@ function ImageDetailPage() {
         return {
           ...prev,
           rating: nextRating,
-          reviewsCount: nextReviewCount
+          reviewsCount: nextReviewCount,
         };
       });
     } catch (err) {
       setRating(Math.round(image?.rating || 0));
-      setRatingError(err.response?.data?.message || 'Failed to submit rating.');
+      setRatingError(
+        err.response?.data?.message || "Failed to submit rating."
+      );
     } finally {
       setSavingRating(false);
     }
   }
 
-  if (loading) return <LoadingState label="Loading..." />;
+  if (loading) return <LoadingSpinner label="Loading..." />;
 
   if (error || !image) {
     return (
-      <EmptyState
+      <EmptyMessage
         title="Unable to load"
-        body={error || 'Try another image.'}
+        body={error || "Try another image."}
       />
     );
   }
@@ -159,10 +165,7 @@ function ImageDetailPage() {
     <div className="detail-layout">
       <section className="detail-media">
         <div className="detail-image-wrap">
-          <img
-            src={imageSrc}
-            alt={image.title}
-          />
+          <img src={imageSrc} alt={image.title} />
         </div>
       </section>
 
@@ -185,7 +188,7 @@ function ImageDetailPage() {
 
             <div>
               <dt>Location</dt>
-              <dd>{image.location || '—'}</dd>
+              <dd>{image.location || "—"}</dd>
             </div>
 
             <div>
@@ -195,7 +198,7 @@ function ImageDetailPage() {
 
             <div>
               <dt>Date</dt>
-              <dd>{image.uploadedAt || '—'}</dd>
+              <dd>{image.uploadedAt || "—"}</dd>
             </div>
 
             <div>
@@ -211,7 +214,11 @@ function ImageDetailPage() {
           <h3>Rating</h3>
           <p className="muted-copy">Select a score from 1–5</p>
 
-          <RatingStars value={rating} onRate={changeRating} isLoading={savingRating} />
+          <RatingStars
+            value={rating}
+            onRate={changeRating}
+            isLoading={savingRating}
+          />
 
           {savingRating && <p className="muted-copy">Saving...</p>}
           {ratingError && <p className="muted-copy">{ratingError}</p>}
@@ -220,22 +227,20 @@ function ImageDetailPage() {
         <Card>
           <div className="section-row">
             <h3>Comments</h3>
-            <span className="status-chip">
-              {image.comments?.length || 0}
-            </span>
+            <span className="status-chip">{image.comments?.length || 0}</span>
           </div>
 
-          <CommentList comments={image.comments || []} />
+          <CommentThread comments={image.comments || []} />
 
           <form className="comment-form" onSubmit={submitComment}>
-            <Textarea
+            <TextareaField
               label="Comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
 
             <Button type="submit" isLoading={savingComment}>
-              {savingComment ? 'Posting...' : 'Post'}
+              {savingComment ? "Posting..." : "Post"}
             </Button>
           </form>
 
@@ -245,5 +250,3 @@ function ImageDetailPage() {
     </div>
   );
 }
-
-export default ImageDetailPage;

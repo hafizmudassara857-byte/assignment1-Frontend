@@ -1,41 +1,41 @@
-import apiClient from './api/client';
-import { getImageList } from '../utils/normalizeImage';
+import apiClient from "./http-client";
+import { getImageList } from "../helpers/photo-data";
 
-export async function fetchImages(searchTerm = '', page = 1, limit = 10) {
+export async function fetchImages(searchTerm = "", page = 1, limit = 10) {
   if (searchTerm && searchTerm.trim()) {
-    const res = await apiClient.get('/search', {
+    const res = await apiClient.get("/search", {
       skipAuth: true,
       params: {
         q: searchTerm,
         page,
-        limit
-      }
+        limit,
+      },
     });
     return getImageList(res.data);
   }
 
-  const res = await apiClient.get('/images', {
+  const res = await apiClient.get("/images", {
     skipAuth: true,
     params: {
       page,
-      limit
-    }
+      limit,
+    },
   });
   return getImageList(res.data);
 }
 
 export async function createImage(payload) {
-  const response = await apiClient.post('/images/upload', payload, {
+  const response = await apiClient.post("/images/upload", payload, {
     headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+      "Content-Type": "multipart/form-data",
+    },
   });
   return response.data;
 }
 
 export async function addComment(imageId, comment) {
   const response = await apiClient.post(`/images/${imageId}/comments`, {
-    text: comment.text
+    text: comment.text,
   });
   return response.data?.data || response.data;
 }
@@ -46,6 +46,8 @@ export async function submitRating(imageId, rating) {
 }
 
 export async function fetchImageById(imageId) {
-  const response = await apiClient.get(`/images/${imageId}`, { skipAuth: true });
+  const response = await apiClient.get(`/images/${imageId}`, {
+    skipAuth: true,
+  });
   return response.data?.data || response.data;
 }

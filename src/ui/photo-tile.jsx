@@ -1,9 +1,13 @@
-import { Link } from 'react-router-dom';
-import Card from './Card';
-import RatingStars from './RatingStars';
-import { getImageCommentCount, getImageSource } from '../utils/normalizeImage';
+import { Link } from "react-router-dom";
+import Card from "./card";
+import RatingStars from "./rating-stars";
+import {
+  getImageAuthor,
+  getImageCommentCount,
+  getImageSource,
+} from "../helpers/photo-data";
 
-function ImageCard({ image }) {
+export default function PhotoTile({ image }) {
   const imageSrc = getImageSource(image);
   const commentCount = getImageCommentCount(image);
   const rating = Number(image.rating || 0);
@@ -13,7 +17,7 @@ function ImageCard({ image }) {
       <Link to={`/images/${image.id || image._id}`} className="image-link">
         <div className="image-frame">
           {imageSrc ? (
-            <img src={imageSrc} alt={image.title || 'Uploaded image'} />
+            <img src={imageSrc} alt={image.title || "Uploaded image"} />
           ) : (
             <div className="image-placeholder">No image</div>
           )}
@@ -32,7 +36,7 @@ function ImageCard({ image }) {
           <p className="image-caption">{image.caption}</p>
 
           <div className="image-meta">
-            <span>By {image.author || image.creator || 'Unknown'}</span>
+            <span>By {getImageAuthor(image)}</span>
 
             <div className="image-rating">
               <RatingStars
@@ -48,5 +52,3 @@ function ImageCard({ image }) {
     </Card>
   );
 }
-
-export default ImageCard;

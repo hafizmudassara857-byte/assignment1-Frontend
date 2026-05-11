@@ -1,14 +1,14 @@
 import { useState } from "react";
-import Card from "../components/Card";
-import EmptyState from "../components/EmptyState";
-import ImageCard from "../components/ImageCard";
-import LoadingState from "../components/LoadingState";
-import SearchBar from "../components/SearchBar";
-import useImageFeed from "../hooks/useImageFeed";
+import Card from "../ui/card";
+import EmptyMessage from "../ui/empty-message";
+import PhotoTile from "../ui/photo-tile";
+import LoadingSpinner from "../ui/loading-spinner";
+import SearchField from "../ui/search-field";
+import useGalleryFeed from "../hooks/use-gallery-feed";
 
-function HomePage() {
+export default function ExplorePhotos() {
   const [query, setQuery] = useState("");
-  const { images, isLoading, errorMessage } = useImageFeed(query);
+  const { images, isLoading, errorMessage } = useGalleryFeed(query);
 
   return (
     <div className="page-stack">
@@ -17,17 +17,20 @@ function HomePage() {
           <span className="eyebrow">Image Library</span>
           <h2>Discover shared visual stories</h2>
         </div>
-        <p>Search images by title, caption, location, or the details creators added.</p>
+        <p>
+          Search images by title, caption, location, or the details creators
+          added.
+        </p>
       </section>
 
       <Card className="toolbar-panel search-panel">
-        <SearchBar value={query} onChange={setQuery} />
+        <SearchField value={query} onChange={setQuery} />
       </Card>
 
-      {isLoading && <LoadingState label="Loading feed..." />}
+      {isLoading && <LoadingSpinner label="Loading feed..." />}
 
       {!isLoading && errorMessage && (
-        <EmptyState title="Error" body={errorMessage} />
+        <EmptyMessage title="Error" body={errorMessage} />
       )}
 
       {!isLoading && !errorMessage && (
@@ -35,11 +38,11 @@ function HomePage() {
           {images.length > 0 ? (
             <section className="image-grid">
               {images.map((img) => (
-                <ImageCard key={img.id || img._id} image={img} />
+                <PhotoTile key={img.id || img._id} image={img} />
               ))}
             </section>
           ) : (
-            <EmptyState
+            <EmptyMessage
               title="No results"
               body="Try a different search term."
             />
@@ -49,5 +52,3 @@ function HomePage() {
     </div>
   );
 }
-
-export default HomePage;

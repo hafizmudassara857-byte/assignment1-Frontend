@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react';
-import { fetchImages } from '../services/imageService';
-import { normalizeImageList } from '../utils/normalizeImage';
-import useDebouncedValue from './useDebouncedValue';
+import { useEffect, useState } from "react";
+import { fetchImages } from "../lib/gallery-api";
+import { normalizeImageList } from "../helpers/photo-data";
+import useDebouncedValue from "./use-debounced-value";
 
-function useImageFeed(searchTerm) {
+export default function useGalleryFeed(searchTerm) {
   const debouncedSearch = useDebouncedValue(searchTerm, 300);
 
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     let active = true;
 
     async function loadImages() {
       setIsLoading(true);
-      setErrorMessage('');
+      setErrorMessage("");
 
       try {
         const data = await fetchImages(debouncedSearch);
@@ -25,9 +25,9 @@ function useImageFeed(searchTerm) {
         const formatted = normalizeImageList(data);
 
         setImages(formatted);
-      } catch (err) {
+      } catch {
         if (active) {
-          setErrorMessage('Failed to load images.');
+          setErrorMessage("Failed to load images.");
         }
       } finally {
         if (active) setIsLoading(false);
@@ -43,5 +43,3 @@ function useImageFeed(searchTerm) {
 
   return { images, isLoading, errorMessage };
 }
-
-export default useImageFeed;

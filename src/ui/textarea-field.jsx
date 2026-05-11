@@ -1,4 +1,4 @@
-function Textarea({ label, hint, className = '', ...props }) {
+export default function TextareaField({ label, hint, className = "", ...props }) {
   return (
     <label className={`field ${className}`.trim()}>
       <span className="field-label">{label}</span>
@@ -7,5 +7,3 @@ function Textarea({ label, hint, className = '', ...props }) {
     </label>
   );
 }
-
-export default Textarea;

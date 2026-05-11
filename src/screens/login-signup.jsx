@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import { loginUser, signupUser } from '../services/authService';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "../ui/button";
+import Card from "../ui/card";
+import TextField from "../ui/text-field";
+import { loginUser, signupUser } from "../lib/auth-api";
 
-function AuthPage({ onAuthSuccess }) {
-  const [mode, setMode] = useState('login');
-  const [message, setMessage] = useState('');
+export default function LoginSignup() {
+  const [mode, setMode] = useState("login");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -15,13 +15,13 @@ function AuthPage({ onAuthSuccess }) {
     let storedUser = null;
 
     try {
-      storedUser = localStorage.getItem('user');
+      storedUser = localStorage.getItem("user");
     } catch {
       storedUser = null;
     }
 
-    if (storedUser && storedUser !== 'undefined' && storedUser !== 'null') {
-      navigate('/', { replace: true });
+    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
@@ -33,11 +33,11 @@ function AuthPage({ onAuthSuccess }) {
     Object.keys(payload).forEach((key) => {
       payload[key] = payload[key].trim();
     });
-    setMessage('');
+    setMessage("");
     setLoading(true);
 
     try {
-      if (mode === 'login') {
+      if (mode === "login") {
         const data = await loginUser(payload);
         const token =
           data?.token ||
@@ -45,28 +45,28 @@ function AuthPage({ onAuthSuccess }) {
           data?.data?.token ||
           data?.data?.accessToken;
         const user =
-          data?.user ||
-          data?.data?.user ||
-          data?.profile ||
-          null;
+          data?.user || data?.data?.user || data?.profile || null;
 
         if (!token || !user) {
-          throw new Error('Invalid login response from server.');
+          throw new Error("Invalid login response from server.");
         }
 
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        window.dispatchEvent(new Event('auth-change'));
-        onAuthSuccess?.(user);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        window.dispatchEvent(new Event("auth-change"));
 
-        setMessage('Login successful.');
-        navigate('/', { replace: true });
+        setMessage("Login successful.");
+        navigate("/", { replace: true });
       } else {
         await signupUser(payload);
-        setMessage('Account created successfully.');
+        setMessage("Account created successfully.");
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || err.message || 'Something went wrong.');
+      setMessage(
+        err.response?.data?.message ||
+          err.message ||
+          "Something went wrong."
+      );
     } finally {
       setLoading(false);
     }
@@ -83,46 +83,52 @@ function AuthPage({ onAuthSuccess }) {
         <div className="auth-toggle">
           <button
             type="button"
-            className={mode === 'login' ? 'toggle-tab active' : 'toggle-tab'}
-            onClick={() => setMode('login')}
+            className={mode === "login" ? "toggle-tab active" : "toggle-tab"}
+            onClick={() => setMode("login")}
           >
             Login
           </button>
 
           <button
             type="button"
-            className={mode === 'signup' ? 'toggle-tab active' : 'toggle-tab'}
-            onClick={() => setMode('signup')}
+            className={
+              mode === "signup" ? "toggle-tab active" : "toggle-tab"
+            }
+            onClick={() => setMode("signup")}
           >
             Signup
           </button>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          <Input
+          <TextField
             label="Email"
             type="email"
             name="email"
             placeholder="Enter email"
           />
 
-          <Input
+          <TextField
             label="Password"
             type="password"
             name="password"
             placeholder="Enter password"
           />
 
-          {mode === 'signup' && (
+          {mode === "signup" && (
             <>
-              <Input
+              <TextField
                 label="Username"
                 name="username"
                 placeholder="Enter username"
               />
               <label className="field">
                 <span className="field-label">Role</span>
-                <select name="role" defaultValue="creator" className="input-field">
+                <select
+                  name="role"
+                  defaultValue="creator"
+                  className="input-field"
+                >
                   <option value="creator">Creator</option>
                   <option value="consumer">Consumer</option>
                 </select>
@@ -133,12 +139,14 @@ function AuthPage({ onAuthSuccess }) {
           {message && <p className="success-banner">{message}</p>}
 
           <Button type="submit" isLoading={loading}>
-            {loading ? 'Please wait...' : mode === 'login' ? 'Login' : 'Create account'}
+            {loading
+              ? "Please wait..."
+              : mode === "login"
+                ? "Login"
+                : "Create account"}
           </Button>
         </form>
       </Card>
     </div>
   );
 }
-
-export default AuthPage;
