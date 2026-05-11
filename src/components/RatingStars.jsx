@@ -15,6 +15,7 @@ function RatingStars({ value, onRate, size = 'md', readonly = false, isLoading =
       ))}
       {isLoading ? <span className="rating-spinner" aria-hidden="true" /> : null}
     </div>
+    
   );
 }
 
